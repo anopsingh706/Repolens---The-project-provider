@@ -4,19 +4,28 @@ const axios = require('axios');
 const cors = require('cors');
 const NodeCache = require('node-cache');
 
+// Initialize Express app
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Cache for 60 seconds
+/**
+ * CACHE SETUP
+ * We use node-cache to store GitHub API responses for 60 seconds.
+ * stdTTL: 60 means keys expire after 60 seconds by default.
+ */
 const cache = new NodeCache({ stdTTL: 60 });
 
-app.use(cors());
+app.use(cors()); // Enable CORS for frontend communication
 app.use(express.json());
 
 // GitHub API Base URL
 const GITHUB_API = 'https://api.github.com';
 
-// Middleware to check cache
+/**
+ * CACHE MIDDLEWARE
+ * Checks if the requested username's data exists in memory.
+ * If found, returns cached data to save GitHub API rate limit.
+ */
 const checkCache = (req, res, next) => {
   const { username } = req.params;
   const cachedData = cache.get(username);
@@ -29,34 +38,40 @@ const checkCache = (req, res, next) => {
 
 /**
  * GET /api/user/:username
- * Fetches user profile and repositories from GitHub API
+ * Main proxy endpoint. It fetches:
+ * 1. Basic user profile (avatar, bio, stats)
+ * 2. User's public repositories (paginated and sorted)
  */
 app.get('/api/user/:username', checkCache, async (req, res) => {
   const { username } = req.params;
   const { sort = 'updated', page = 1 } = req.query;
 
   try {
+    // Add authorization header if token is provided in .env
     const headers = {};
     if (process.env.GITHUB_TOKEN) {
       headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`;
     }
 
-    // Fetch User Profile
+    // Step 1: Fetch User Profile
     const userResponse = await axios.get(`${GITHUB_API}/users/${username}`, { headers });
     const user = userResponse.data;
 
-    // Fetch User Repositories (paginated)
+    // Step 2: Fetch User Repositories
+    // We map sort values to GitHub API standards
     const reposResponse = await axios.get(`${GITHUB_API}/users/${username}/repos`, {
       headers,
       params: {
         sort: sort === 'name' ? 'full_name' : sort,
         direction: sort === 'name' ? 'asc' : 'desc',
-        per_page: 30,
+        per_page: 30, // GitHub default per page
         page: page
       }
     });
     const repos = reposResponse.data;
 
+    // Step 3: Clean and Format Response
+    // We only send necessary fields to the frontend
     const responseData = {
       user: {
         avatar_url: user.avatar_url,
@@ -80,15 +95,16 @@ app.get('/api/user/:username', checkCache, async (req, res) => {
       }))
     };
 
-    // Store in cache
+    // Step 4: Store results in cache before sending
     cache.set(username, responseData);
 
     res.json(responseData);
   } catch (error) {
+    // Step 5: Graceful Error Handling
     if (error.response) {
       const status = error.response.status;
       if (status === 404) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'GitHub user not found' });
       }
       if (status === 403) {
         return res.status(403).json({ message: 'GitHub API rate limit exceeded. Please try again later.' });

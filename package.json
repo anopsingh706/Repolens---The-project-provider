@@ -1,0 +1,14 @@
+{
+  "name": "repolens-monorepo",
+  "version": "1.0.0",
+  "description": "Exercise 3: GitHub Repo Explorer",
+  "scripts": {
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npm run dev",
+    "dev": "npx concurrently \"npm run start:server\" \"npm run start:client\"",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
