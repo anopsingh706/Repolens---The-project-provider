@@ -4,14 +4,12 @@ RepoLens is a full-stack web application that allows users to explore GitHub pro
 
 This project was built as part of the Studio Graphene Full Stack Developer assessment (Exercise 3).
 
-## Live Demo
-- **Frontend:** [Link to be added]
-- **Backend:** [Link to be added]
+## Live Demo  : https://repolens-the-project-provider.vercel.app/
 
 ## Tech Stack
 - **Frontend:** React (Vite), Axios, Lucide React (Icons), Plain CSS.
 - **Backend:** Node.js, Express, Axios, Node-Cache (In-memory caching), Cors, Dotenv.
-- **Why this stack?**
+
   - **React:** For a responsive and component-based UI.
   - **Express:** Lightweight and flexible backend framework.
   - **Node-Cache:** To implement the required 60-second caching strategy easily.
