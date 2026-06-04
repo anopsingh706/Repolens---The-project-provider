@@ -23,14 +23,17 @@ const GITHUB_API = 'https://api.github.com';
 
 /**
  * CACHE MIDDLEWARE
- * Checks if the requested username's data exists in memory.
+ * Checks if the requested username's data (with specific sort/page) exists in memory.
  * If found, returns cached data to save GitHub API rate limit.
  */
 const checkCache = (req, res, next) => {
   const { username } = req.params;
-  const cachedData = cache.get(username);
+  const { sort = 'updated', page = 1 } = req.query;
+  const cacheKey = `${username}-${sort}-${page}`;
+  
+  const cachedData = cache.get(cacheKey);
   if (cachedData) {
-    console.log(`Cache hit for ${username}`);
+    console.log(`Cache hit for ${cacheKey}`);
     return res.json(cachedData);
   }
   next();
@@ -45,6 +48,7 @@ const checkCache = (req, res, next) => {
 app.get('/api/user/:username', checkCache, async (req, res) => {
   const { username } = req.params;
   const { sort = 'updated', page = 1 } = req.query;
+  const cacheKey = `${username}-${sort}-${page}`;
 
   try {
     // Add authorization header if token is provided in .env
@@ -96,7 +100,7 @@ app.get('/api/user/:username', checkCache, async (req, res) => {
     };
 
     // Step 4: Store results in cache before sending
-    cache.set(username, responseData);
+    cache.set(cacheKey, responseData);
 
     res.json(responseData);
   } catch (error) {

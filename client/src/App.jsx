@@ -20,6 +20,8 @@ function App() {
   const [error, setError] = useState('');
   // Sort criteria for repositories
   const [sortBy, setSortBy] = useState('updated');
+  // Filter text for repositories
+  const [filterText, setFilterText] = useState('');
   // History of recent searches stored in localStorage
   const [recentSearches, setRecentSearches] = useState([]);
 
@@ -45,7 +47,7 @@ function App() {
   /**
    * CORE: Fetches data from our Node.js backend proxy
    */
-  const fetchData = async (searchName) => {
+  const fetchData = async (searchName, isNewSearch = false) => {
     if (!searchName) return;
     
     setLoading(true);
@@ -56,7 +58,10 @@ function App() {
         params: { sort: sortBy }
       });
       setUserData(response.data);
-      saveRecentSearch(searchName);
+      if (isNewSearch) {
+        saveRecentSearch(searchName);
+        setFilterText(''); // Reset filter only on new search
+      }
     } catch (err) {
       // Handle 404, rate limits, or network errors
       setError(err.response?.data?.message || 'Something went wrong while fetching data');
@@ -71,7 +76,7 @@ function App() {
    */
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchData(username);
+    fetchData(username, true);
   };
 
   /**
@@ -79,7 +84,7 @@ function App() {
    */
   const handleRecentClick = (name) => {
     setUsername(name);
-    fetchData(name);
+    fetchData(name, true);
   };
 
   /**
@@ -87,9 +92,15 @@ function App() {
    */
   useEffect(() => {
     if (userData && userData.user) {
-      fetchData(username);
+      fetchData(username, false);
     }
   }, [sortBy]);
+
+  // Derived state: filtered repositories
+  const filteredRepos = userData?.repos.filter(repo => 
+    repo.name.toLowerCase().includes(filterText.toLowerCase()) ||
+    (repo.language && repo.language.toLowerCase().includes(filterText.toLowerCase()))
+  ) || [];
 
   return (
     <div className="app-container">
@@ -167,23 +178,36 @@ function App() {
               <div className="repos-header">
                 <h3>Public Repositories ({userData.user.public_repos})</h3>
                 
-                {/* SORT DROPDOWN */}
-                <div className="sort-controls">
-                  <Filter size={16} />
-                  <label htmlFor="sort">Sort by:</label>
-                  <select id="sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                    <option value="updated">Last Updated</option>
-                    <option value="stars">Most Stars</option>
-                    <option value="name">Name (A-Z)</option>
-                  </select>
+                <div className="controls-group">
+                  {/* FILTER INPUT */}
+                  <div className="filter-control">
+                    <Search size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Filter repos..." 
+                      value={filterText}
+                      onChange={(e) => setFilterText(e.target.value)}
+                    />
+                  </div>
+
+                  {/* SORT DROPDOWN */}
+                  <div className="sort-controls">
+                    <Filter size={16} />
+                    <label htmlFor="sort">Sort by:</label>
+                    <select id="sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                      <option value="updated">Last Updated</option>
+                      <option value="stars">Most Stars</option>
+                      <option value="name">Name (A-Z)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
               <div className="repos-list">
-                {userData.repos.length === 0 ? (
-                  <p className="no-repos">This user has no public repositories.</p>
+                {filteredRepos.length === 0 ? (
+                  <p className="no-repos">No repositories match your filter.</p>
                 ) : (
-                  userData.repos.map(repo => (
+                  filteredRepos.map(repo => (
                     <div key={repo.id} className="repo-card">
                       <div className="repo-info">
                         <h4>
