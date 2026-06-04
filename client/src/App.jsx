@@ -106,6 +106,7 @@ function App() {
     <div className="app-container">
       {/* HEADER SECTION */}
       <header className="app-header">
+        <img src="/logo.svg" alt="RepoLens Logo" className="app-logo" />
         <h1>RepoLens</h1>
         <p>Explore GitHub profiles and repositories with ease.</p>
       </header>
