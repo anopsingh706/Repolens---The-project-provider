@@ -1,7 +1,35 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="40" height="40" rx="8" fill="#0366d6"/>
-  <path d="M20 10V30" stroke="white" stroke-width="3" stroke-linecap="round"/>
-  <path d="M12 20H28" stroke="white" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="20" cy="20" r="6" stroke="white" stroke-width="2.5" fill="#0366d6"/>
-  <path d="M24 24L30 30" stroke="white" stroke-width="3" stroke-linecap="round"/>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Professional Gradient Background -->
+  <defs>
+    <linearGradient id="logoGradient" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0366d6"/>
+      <stop offset="100%" stop-color="#024ea2"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="1" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main Shape (Rounded Square) -->
+  <rect width="120" height="120" rx="28" fill="url(#logoGradient)"/>
+
+  <!-- Styled "R" and Lens Path -->
+  <g filter="url(#shadow)">
+    <!-- The "R" Shape -->
+    <path d="M35 35V85M35 35H60C70 35 75 42 75 50C75 58 70 65 60 65H35M60 65L80 85" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- The "Lens" / Outer Circle -->
+    <circle cx="75" cy="75" r="22" stroke="white" stroke-width="6" fill="none"/>
+    
+    <!-- Shine/Reflection in Lens -->
+    <path d="M85 65C88 68 90 72 90 75" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  </g>
 </svg>
