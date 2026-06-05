@@ -1,6 +1,8 @@
 # RepoLens - GitHub Repo Explorer
 
-RepoLens is a full-stack web application built for the **Studio Graphene Full Stack Developer Assessment (Exercise 3)**. It allows users to search for any GitHub profile and explore their public repositories in a clean, responsive interface. The application acts as a secure proxy to the GitHub REST API, implementing a 60-second caching strategy to optimize performance, minimize API calls, and ensure a smooth user experience even under rate-limiting constraints.
+RepoLens is a full-stack web application. It allows users to search for any GitHub profile and explore their public repositories in a clean, responsive interface. 
+
+The application acts as a secure proxy to the GitHub REST API, implementing a 60-second caching strategy to optimize performance, minimize API calls, and ensure a smooth user experience even under rate-limiting constraints.
 
 ## 🚀 Live Demo
 **Live Link:** [https://repolens-the-project-provider.vercel.app/](https://repolens-the-project-provider.vercel.app/)
